@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dictado por voz</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="contenedor">
+    <header>
+      <h1>🎤 Dictado por voz</h1>
+      <p class="sub">Habla y se escribe solo, con autocorrección de puntuación y mayúsculas.</p>
+    </header>
+
+    <!-- Aviso si el navegador no soporta reconocimiento de voz -->
+    <div id="no-soportado" class="aviso oculto">
+      ⚠️ Tu navegador no soporta el reconocimiento de voz. Abre esta página en
+      <strong>Google Chrome</strong> o Chromium.
+    </div>
+
+    <div class="barra-control">
+      <button id="btn-dictar" class="grande">🎙️ Empezar a dictar</button>
+      <span id="estado" class="estado">Detenido</span>
+
+      <label class="selector">
+        Idioma:
+        <select id="idioma">
+          <option value="es-ES" selected>Español (España)</option>
+          <option value="es-MX">Español (México)</option>
+          <option value="en-US">Inglés (EE. UU.)</option>
+        </select>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="autocorregir" checked>
+        Autocorregir
+      </label>
+    </div>
+
+    <div class="editor">
+      <textarea id="texto" placeholder="Aquí aparecerá lo que dictes… También puedes editarlo a mano."></textarea>
+      <p id="interino" class="interino"></p>
+    </div>
+
+    <div class="acciones">
+      <button id="btn-copiar" class="secundario">📋 Copiar</button>
+      <button id="btn-descargar" class="secundario">💾 Descargar .txt</button>
+      <button id="btn-limpiar" class="secundario">🗑️ Limpiar</button>
+      <span id="contador" class="contador">0 palabras</span>
+    </div>
+
+    <details class="ayuda">
+      <summary>Comandos de voz que puedes decir</summary>
+      <ul>
+        <li><b>"punto"</b> → .  &nbsp;|&nbsp; <b>"coma"</b> → ,</li>
+        <li><b>"dos puntos"</b> → :  &nbsp;|&nbsp; <b>"punto y coma"</b> → ;</li>
+        <li><b>"punto y aparte"</b> → . y salto de línea</li>
+        <li><b>"nueva línea"</b> → salto de línea</li>
+        <li><b>"signo de interrogación"</b> → ?  &nbsp;|&nbsp; <b>"signo de exclamación"</b> → !</li>
+        <li><b>"abre/cierra paréntesis"</b> → ( )</li>
+      </ul>
+      <p>Las mayúsculas tras punto y al inicio se ponen solas.</p>
+    </details>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
