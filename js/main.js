@@ -14,7 +14,7 @@ const contadorEl   = document.getElementById("contador");
 const recTxt       = document.querySelector(".rec__txt");
 
 // --- Versión visible (se cambia en cada despliegue para identificarla en el móvil) ---
-const VERSION = "v4";
+const VERSION = "v5";
 document.getElementById("version").textContent = VERSION;
 const vPie = document.getElementById("version-pie");
 if (vPie) vPie.textContent = "DICTADO · " + VERSION;
@@ -67,36 +67,34 @@ function autocorregir(texto) {
 // 4) Configurar el reconocimiento de voz.
 let recognition = null;
 let escuchando = false;
-let baseRaw = "";      // texto consolidado (sesiones previas + ediciones a mano)
-let finalSesion = "";  // texto definitivo de la sesión de escucha actual
-let ultimaConsolidada = ""; // última frase fijada, para no repetirla al reiniciar
+let textoBase = "";       // todo el texto ya confirmado (sesiones previas + ediciones)
+let yaConfirmado = false; // ¿ya se añadió la frase de la sesión actual? (evita duplicados)
 
 function crearReconocimiento() {
   const r = new SpeechRecognition();
   r.lang = idiomaEl.value;
-  r.continuous = true;       // no parar tras la primera frase
-  r.interimResults = true;   // mostrar resultados provisionales
+  // IMPORTANTE: modo NO continuo. En Chrome Android el modo continuo es la causa
+  // de las frases repetidas. Aquí cada frase es una sesión corta que se confirma
+  // UNA sola vez; luego reiniciamos en onend para seguir dictando.
+  r.continuous = false;
+  r.interimResults = true;
 
   r.onresult = (evento) => {
-    // Reconstruimos SIEMPRE desde cero el texto de esta sesión (índices 0..n).
-    // En Android, 'onresult' se dispara varias veces para la misma frase; si
-    // fuéramos acumulando, saldría repetida ("hola hola hola").
-    finalSesion = "";
     let interino = "";
-    let previa = null;  // para descartar finales repetidos consecutivos (bug Android)
     for (let i = 0; i < evento.results.length; i++) {
       const res = evento.results[i];
-      const txt = res[0].transcript.trim();
       if (res.isFinal) {
-        if (txt && txt !== previa) {   // si es igual a la anterior, es una repetición del motor
-          finalSesion += txt + " ";
-          previa = txt;
+        // Confirmar la frase solo una vez, aunque Android dispare el resultado
+        // final varias veces dentro de la misma sesión.
+        if (!yaConfirmado) {
+          textoBase += res[0].transcript.trim() + " ";
+          yaConfirmado = true;
         }
       } else {
-        interino += res[0].transcript + " ";
+        interino += res[0].transcript;
       }
     }
-    textoEl.value = autocorregir(baseRaw + finalSesion);
+    textoEl.value = autocorregir(textoBase);
     interinoEl.textContent = interino;
     textoEl.scrollTop = textoEl.scrollHeight;
     actualizarContador();
@@ -112,17 +110,10 @@ function crearReconocimiento() {
     }
   };
 
-  // Al terminar una sesión (Android la corta tras cada frase) consolidamos lo
-  // reconocido en la base y, si seguimos dictando, reiniciamos.
+  // Cada sesión cubre una frase. Al terminar, preparamos la siguiente y
+  // reiniciamos si seguimos dictando.
   r.onend = () => {
-    // Consolidar lo de esta sesión, salvo que sea idéntico a lo último fijado
-    // (eso pasa cuando Android, al reiniciar, vuelve a mandar la misma frase).
-    const limpio = finalSesion.trim();
-    if (limpio && limpio !== ultimaConsolidada) {
-      baseRaw += finalSesion;
-      ultimaConsolidada = limpio;
-    }
-    finalSesion = "";
+    yaConfirmado = false;
     if (escuchando) {
       try { r.start(); } catch (_) {}
     }
@@ -134,9 +125,8 @@ function crearReconocimiento() {
 // 5) Botón empezar/parar.
 btnDictar.addEventListener("click", () => {
   if (!escuchando) {
-    baseRaw = textoEl.value ? textoEl.value + " " : ""; // conservar lo editado a mano
-    finalSesion = "";
-    ultimaConsolidada = "";
+    textoBase = textoEl.value ? textoEl.value + " " : ""; // conservar lo editado a mano
+    yaConfirmado = false;
     recognition = crearReconocimiento();
     escuchando = true;
     recognition.start();
@@ -172,9 +162,8 @@ document.getElementById("btn-descargar").addEventListener("click", () => {
 });
 
 document.getElementById("btn-limpiar").addEventListener("click", () => {
-  baseRaw = "";
-  finalSesion = "";
-  ultimaConsolidada = "";
+  textoBase = "";
+  yaConfirmado = false;
   textoEl.value = "";
   interinoEl.textContent = "";
   actualizarContador();
