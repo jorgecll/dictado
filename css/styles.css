@@ -185,10 +185,8 @@ textarea:focus { outline: none; border-color: var(--rojo); }
 }
 
 /* --- Acciones --- */
-.acciones { display: flex; flex-wrap: wrap; gap: 0; align-items: stretch; padding: 0; }
+.acciones { display: grid; grid-template-columns: 1fr 1fr; padding: 0; }
 .btn {
-  flex: 1;
-  min-width: 33%;
   background: var(--blanco);
   color: var(--negro);
   border: none;
@@ -203,9 +201,9 @@ textarea:focus { outline: none; border-color: var(--rojo); }
   transition: all 0.1s ease;
 }
 .btn:hover { background: var(--negro); color: var(--blanco); }
-.acciones .btn:last-of-type { border-right: none; }
+.btn:nth-of-type(2n) { border-right: none; }  /* columna derecha sin borde */
 .contador {
-  flex-basis: 100%;
+  grid-column: 1 / -1;
   font-family: "Space Mono", monospace;
   font-size: 0.72rem;
   letter-spacing: 0.15em;

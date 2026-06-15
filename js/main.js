@@ -14,7 +14,7 @@ const contadorEl   = document.getElementById("contador");
 const recTxt       = document.querySelector(".rec__txt");
 
 // --- Versión visible (se cambia en cada despliegue para identificarla en el móvil) ---
-const VERSION = "v5";
+const VERSION = "v6";
 document.getElementById("version").textContent = VERSION;
 const vPie = document.getElementById("version-pie");
 if (vPie) vPie.textContent = "DICTADO · " + VERSION;
@@ -146,6 +146,25 @@ btnDictar.addEventListener("click", () => {
 });
 
 // 6) Acciones: copiar, descargar, limpiar.
+document.getElementById("btn-compartir").addEventListener("click", async () => {
+  const boton = document.getElementById("btn-compartir");
+  const texto = textoEl.value.trim();
+  if (!texto) { flash(boton, "NADA QUE COMPARTIR"); return; }
+
+  if (navigator.share) {
+    // Móvil: abre el menú nativo de Android (WhatsApp, Telegram, Gmail…).
+    try {
+      await navigator.share({ title: "Dictado", text: texto });
+    } catch (e) {
+      // El usuario canceló el menú: no hacemos nada.
+    }
+  } else {
+    // Escritorio u otros sin Web Share: copiamos como alternativa.
+    await navigator.clipboard.writeText(texto);
+    flash(boton, "✓ COPIADO (SIN COMPARTIR)");
+  }
+});
+
 document.getElementById("btn-copiar").addEventListener("click", async () => {
   await navigator.clipboard.writeText(textoEl.value);
   flash(document.getElementById("btn-copiar"), "✓ COPIADO");
