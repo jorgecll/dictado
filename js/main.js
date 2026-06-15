@@ -61,6 +61,7 @@ let recognition = null;
 let escuchando = false;
 let baseRaw = "";      // texto consolidado (sesiones previas + ediciones a mano)
 let finalSesion = "";  // texto definitivo de la sesión de escucha actual
+let ultimaConsolidada = ""; // última frase fijada, para no repetirla al reiniciar
 
 function crearReconocimiento() {
   const r = new SpeechRecognition();
@@ -74,10 +75,18 @@ function crearReconocimiento() {
     // fuéramos acumulando, saldría repetida ("hola hola hola").
     finalSesion = "";
     let interino = "";
+    let previa = null;  // para descartar finales repetidos consecutivos (bug Android)
     for (let i = 0; i < evento.results.length; i++) {
       const res = evento.results[i];
-      if (res.isFinal) finalSesion += res[0].transcript + " ";
-      else interino += res[0].transcript + " ";
+      const txt = res[0].transcript.trim();
+      if (res.isFinal) {
+        if (txt && txt !== previa) {   // si es igual a la anterior, es una repetición del motor
+          finalSesion += txt + " ";
+          previa = txt;
+        }
+      } else {
+        interino += res[0].transcript + " ";
+      }
     }
     textoEl.value = autocorregir(baseRaw + finalSesion);
     interinoEl.textContent = interino;
@@ -98,7 +107,13 @@ function crearReconocimiento() {
   // Al terminar una sesión (Android la corta tras cada frase) consolidamos lo
   // reconocido en la base y, si seguimos dictando, reiniciamos.
   r.onend = () => {
-    baseRaw += finalSesion;
+    // Consolidar lo de esta sesión, salvo que sea idéntico a lo último fijado
+    // (eso pasa cuando Android, al reiniciar, vuelve a mandar la misma frase).
+    const limpio = finalSesion.trim();
+    if (limpio && limpio !== ultimaConsolidada) {
+      baseRaw += finalSesion;
+      ultimaConsolidada = limpio;
+    }
     finalSesion = "";
     if (escuchando) {
       try { r.start(); } catch (_) {}
@@ -113,6 +128,7 @@ btnDictar.addEventListener("click", () => {
   if (!escuchando) {
     baseRaw = textoEl.value ? textoEl.value + " " : ""; // conservar lo editado a mano
     finalSesion = "";
+    ultimaConsolidada = "";
     recognition = crearReconocimiento();
     escuchando = true;
     recognition.start();
@@ -150,6 +166,7 @@ document.getElementById("btn-descargar").addEventListener("click", () => {
 document.getElementById("btn-limpiar").addEventListener("click", () => {
   baseRaw = "";
   finalSesion = "";
+  ultimaConsolidada = "";
   textoEl.value = "";
   interinoEl.textContent = "";
   actualizarContador();
