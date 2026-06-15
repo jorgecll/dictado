@@ -149,6 +149,7 @@ body {
   background: radial-gradient(circle at 50% 36%, #ffffff, #ededed 72%);
   box-shadow: 6px 6px 0 var(--negro);
   display: flex; align-items: center; justify-content: center;
+  touch-action: none;   /* evita que el navegador cancele el toque (push-to-talk fiable) */
 }
 /* Anillos concéntricos = botón físico de grabación */
 .rec-dial::before {
@@ -248,6 +249,7 @@ textarea {
   font-family: "Space Grotesk", sans-serif;
   font-size: 1.05rem;
   line-height: 1.6;
+  caret-color: var(--rojo);   /* cursor rojo, visible */
 }
 textarea::placeholder { color: var(--gris-medio); font-size: 0.8rem; letter-spacing: 0.05em; }
 textarea:focus { outline: none; border-color: var(--rojo); }

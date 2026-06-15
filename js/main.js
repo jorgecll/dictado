@@ -14,7 +14,7 @@ const interinoEl   = document.getElementById("interino");
 const contadorEl   = document.getElementById("contador");
 
 // --- Versión visible (se cambia en cada despliegue para identificarla en el móvil) ---
-const VERSION = "v8";
+const VERSION = "v9";
 document.getElementById("version").textContent = VERSION;
 const vPie = document.getElementById("version-pie");
 if (vPie) vPie.textContent = "DICTADO · " + VERSION;
@@ -97,6 +97,7 @@ function crearReconocimiento() {
     }
     textoEl.value = autocorregir(textoBase);
     interinoEl.textContent = interino;
+    caretAlFinal();
     textoEl.scrollTop = textoEl.scrollHeight;
     actualizarContador();
   };
@@ -137,6 +138,10 @@ function iniciar(modo) {
   estadoEl.textContent = "● ESCUCHANDO";
   estadoEl.classList.add("activo");
   (modo === "hold" ? btnHold : btnToggle).classList.add("grabando");
+  // Mostrar el cursor en el cuadro de texto SIN abrir el teclado del móvil.
+  textoEl.inputMode = "none";
+  textoEl.focus({ preventScroll: true });
+  caretAlFinal();
 }
 
 function detener() {
@@ -149,6 +154,13 @@ function detener() {
   btnHold.classList.remove("grabando");
   btnToggle.classList.remove("grabando");
   modoActual = null;
+  textoEl.inputMode = "text"; // restaurar el teclado para edición manual
+}
+
+// Lleva el cursor (caret) al final del texto.
+function caretAlFinal() {
+  const fin = textoEl.value.length;
+  try { textoEl.setSelectionRange(fin, fin); } catch (_) {}
 }
 
 // MANTÉN — interruptor momentáneo: graba solo mientras se mantiene pulsado.
