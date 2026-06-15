@@ -11,6 +11,14 @@ const autocorregirEl = document.getElementById("autocorregir");
 const textoEl      = document.getElementById("texto");
 const interinoEl   = document.getElementById("interino");
 const contadorEl   = document.getElementById("contador");
+const recTxt       = document.querySelector(".rec__txt");
+
+// --- Versión visible (se cambia en cada despliegue para identificarla en el móvil) ---
+const VERSION = "v4";
+document.getElementById("version").textContent = VERSION;
+const vPie = document.getElementById("version-pie");
+if (vPie) vPie.textContent = "DICTADO · " + VERSION;
+console.log("DICTADO", VERSION);
 
 if (!SpeechRecognition) {
   document.getElementById("no-soportado").classList.remove("oculto");
@@ -96,11 +104,11 @@ function crearReconocimiento() {
 
   r.onerror = (e) => {
     if (e.error === "not-allowed") {
-      estadoEl.textContent = "Permiso de micrófono denegado";
+      estadoEl.textContent = "MICRÓFONO DENEGADO";
     } else if (e.error === "no-speech") {
-      estadoEl.textContent = "No te oí… sigo escuchando";
+      estadoEl.textContent = "NO TE OÍ… SIGO ESCUCHANDO";
     } else {
-      estadoEl.textContent = "Error: " + e.error;
+      estadoEl.textContent = "ERROR: " + e.error;
     }
   };
 
@@ -132,17 +140,17 @@ btnDictar.addEventListener("click", () => {
     recognition = crearReconocimiento();
     escuchando = true;
     recognition.start();
-    btnDictar.textContent = "⏹️ Parar";
+    recTxt.textContent = "PARAR";
     btnDictar.classList.add("grabando");
-    estadoEl.textContent = "● Escuchando…";
+    estadoEl.textContent = "● ESCUCHANDO";
     estadoEl.classList.add("activo");
   } else {
     escuchando = false;
     recognition.stop();
     interinoEl.textContent = "";
-    btnDictar.textContent = "🎙️ Empezar a dictar";
+    recTxt.textContent = "EMPEZAR A DICTAR";
     btnDictar.classList.remove("grabando");
-    estadoEl.textContent = "Detenido";
+    estadoEl.textContent = "DETENIDO";
     estadoEl.classList.remove("activo");
   }
 });
@@ -150,7 +158,7 @@ btnDictar.addEventListener("click", () => {
 // 6) Acciones: copiar, descargar, limpiar.
 document.getElementById("btn-copiar").addEventListener("click", async () => {
   await navigator.clipboard.writeText(textoEl.value);
-  flash(document.getElementById("btn-copiar"), "✓ Copiado");
+  flash(document.getElementById("btn-copiar"), "✓ COPIADO");
 });
 
 document.getElementById("btn-descargar").addEventListener("click", () => {
@@ -181,7 +189,7 @@ autocorregirEl.addEventListener("change", () => {
 // 7) Utilidades.
 function actualizarContador() {
   const palabras = textoEl.value.trim().split(/\s+/).filter(Boolean).length;
-  contadorEl.textContent = palabras + (palabras === 1 ? " palabra" : " palabras");
+  contadorEl.textContent = palabras + (palabras === 1 ? " PALABRA" : " PALABRAS");
 }
 
 function flash(boton, mensaje) {

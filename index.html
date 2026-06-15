@@ -3,67 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dictado por voz</title>
+  <meta name="theme-color" content="#ffffff">
+  <title>DICTADO — voz a texto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <main class="contenedor">
-    <header>
-      <h1>🎤 Dictado por voz</h1>
-      <p class="sub">Habla y se escribe solo, con autocorrección de puntuación y mayúsculas.</p>
+  <div class="marco">
+    <!-- Cabecera -->
+    <header class="cab">
+      <div class="cab__titulo">
+        <h1>DICTADO</h1>
+        <span class="cab__sub">VOZ → TEXTO</span>
+      </div>
+      <span class="version" id="version">v—</span>
     </header>
 
-    <!-- Aviso si el navegador no soporta reconocimiento de voz -->
+    <!-- Aviso navegador no compatible -->
     <div id="no-soportado" class="aviso oculto">
-      ⚠️ Tu navegador no soporta el reconocimiento de voz. Abre esta página en
-      <strong>Google Chrome</strong> o Chromium.
+      ⚠ NAVEGADOR NO COMPATIBLE — ABRE EN GOOGLE CHROME
     </div>
 
-    <div class="barra-control">
-      <button id="btn-dictar" class="grande">🎙️ Empezar a dictar</button>
-      <span id="estado" class="estado">Detenido</span>
+    <!-- Botón principal -->
+    <section class="bloque">
+      <button id="btn-dictar" class="rec">
+        <span class="rec__punto"></span>
+        <span class="rec__txt">EMPEZAR A DICTAR</span>
+      </button>
+      <div class="estado-linea">
+        <span id="estado" class="estado">DETENIDO</span>
+      </div>
+    </section>
 
-      <label class="selector">
-        Idioma:
+    <!-- Opciones -->
+    <section class="bloque opciones">
+      <label class="campo">
+        <span>IDIOMA</span>
         <select id="idioma">
-          <option value="es-ES" selected>Español (España)</option>
-          <option value="es-MX">Español (México)</option>
-          <option value="en-US">Inglés (EE. UU.)</option>
+          <option value="es-ES" selected>ES · ESPAÑA</option>
+          <option value="es-MX">ES · MÉXICO</option>
+          <option value="en-US">EN · USA</option>
         </select>
       </label>
-
-      <label class="check">
+      <label class="campo campo--check">
         <input type="checkbox" id="autocorregir" checked>
-        Autocorregir
+        <span>AUTOCORREGIR</span>
       </label>
-    </div>
+    </section>
 
-    <div class="editor">
-      <textarea id="texto" placeholder="Aquí aparecerá lo que dictes… También puedes editarlo a mano."></textarea>
+    <!-- Editor -->
+    <section class="bloque">
+      <textarea id="texto" placeholder="HABLA Y AQUÍ APARECE EL TEXTO. TAMBIÉN PUEDES ESCRIBIR A MANO."></textarea>
       <p id="interino" class="interino"></p>
-    </div>
+    </section>
 
-    <div class="acciones">
-      <button id="btn-copiar" class="secundario">📋 Copiar</button>
-      <button id="btn-descargar" class="secundario">💾 Descargar .txt</button>
-      <button id="btn-limpiar" class="secundario">🗑️ Limpiar</button>
-      <span id="contador" class="contador">0 palabras</span>
-    </div>
+    <!-- Acciones -->
+    <section class="bloque acciones">
+      <button id="btn-copiar" class="btn">COPIAR</button>
+      <button id="btn-descargar" class="btn">DESCARGAR</button>
+      <button id="btn-limpiar" class="btn">LIMPIAR</button>
+      <span id="contador" class="contador">0 PALABRAS</span>
+    </section>
 
+    <!-- Ayuda -->
     <details class="ayuda">
-      <summary>Comandos de voz que puedes decir</summary>
+      <summary>COMANDOS DE VOZ</summary>
       <ul>
-        <li><b>"punto"</b> → .  &nbsp;|&nbsp; <b>"coma"</b> → ,</li>
-        <li><b>"dos puntos"</b> → :  &nbsp;|&nbsp; <b>"punto y coma"</b> → ;</li>
-        <li><b>"punto y aparte"</b> → . y salto de línea</li>
+        <li><b>"punto"</b> → . &nbsp; <b>"coma"</b> → ,</li>
+        <li><b>"dos puntos"</b> → : &nbsp; <b>"punto y coma"</b> → ;</li>
+        <li><b>"punto y aparte"</b> → . + salto de línea</li>
         <li><b>"nueva línea"</b> → salto de línea</li>
-        <li><b>"signo de interrogación"</b> → ?  &nbsp;|&nbsp; <b>"signo de exclamación"</b> → !</li>
-        <li><b>"abre/cierra paréntesis"</b> → ( )</li>
+        <li><b>"signo de interrogación / exclamación"</b> → ? !</li>
+        <li><b>"abre / cierra paréntesis"</b> → ( )</li>
       </ul>
-      <p>Las mayúsculas tras punto y al inicio se ponen solas.</p>
     </details>
-  </main>
 
-  <script src="js/main.js?v=3"></script>
+    <footer class="pie">
+      <span id="version-pie">DICTADO</span>
+      <span>WEB SPEECH API · CHROME</span>
+    </footer>
+  </div>
+
+  <script src="js/main.js?v=4"></script>
 </body>
 </html>
