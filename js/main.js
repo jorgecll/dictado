@@ -4,17 +4,17 @@
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 // Referencias a los elementos de la página.
-const btnDictar    = document.getElementById("btn-dictar");
+const btnHold      = document.getElementById("btn-hold");
+const btnToggle    = document.getElementById("btn-toggle");
 const estadoEl     = document.getElementById("estado");
 const idiomaEl     = document.getElementById("idioma");
 const autocorregirEl = document.getElementById("autocorregir");
 const textoEl      = document.getElementById("texto");
 const interinoEl   = document.getElementById("interino");
 const contadorEl   = document.getElementById("contador");
-const recTxt       = document.querySelector(".rec__txt");
 
 // --- Versión visible (se cambia en cada despliegue para identificarla en el móvil) ---
-const VERSION = "v6";
+const VERSION = "v7";
 document.getElementById("version").textContent = VERSION;
 const vPie = document.getElementById("version-pie");
 if (vPie) vPie.textContent = "DICTADO · " + VERSION;
@@ -22,7 +22,8 @@ console.log("DICTADO", VERSION);
 
 if (!SpeechRecognition) {
   document.getElementById("no-soportado").classList.remove("oculto");
-  btnDictar.disabled = true;
+  btnHold.disabled = true;
+  btnToggle.disabled = true;
 }
 
 // 2) Comandos de voz -> símbolos. Los de varias palabras van ANTES que los simples.
@@ -122,27 +123,50 @@ function crearReconocimiento() {
   return r;
 }
 
-// 5) Botón empezar/parar.
-btnDictar.addEventListener("click", () => {
-  if (!escuchando) {
-    textoBase = textoEl.value ? textoEl.value + " " : ""; // conservar lo editado a mano
-    yaConfirmado = false;
-    recognition = crearReconocimiento();
-    escuchando = true;
-    recognition.start();
-    recTxt.textContent = "PARAR";
-    btnDictar.classList.add("grabando");
-    estadoEl.textContent = "● ESCUCHANDO";
-    estadoEl.classList.add("activo");
-  } else {
-    escuchando = false;
-    recognition.stop();
-    interinoEl.textContent = "";
-    recTxt.textContent = "EMPEZAR A DICTAR";
-    btnDictar.classList.remove("grabando");
-    estadoEl.textContent = "DETENIDO";
-    estadoEl.classList.remove("activo");
-  }
+// 5) Control de grabación: dos modos (mantener pulsado / alternar).
+let modoActual = null; // "hold" | "toggle"
+
+function iniciar(modo) {
+  if (escuchando) return;
+  textoBase = textoEl.value ? textoEl.value + " " : ""; // conservar lo editado a mano
+  yaConfirmado = false;
+  recognition = crearReconocimiento();
+  escuchando = true;
+  modoActual = modo;
+  try { recognition.start(); } catch (_) {}
+  estadoEl.textContent = "● ESCUCHANDO";
+  estadoEl.classList.add("activo");
+  (modo === "hold" ? btnHold : btnToggle).classList.add("grabando");
+}
+
+function detener() {
+  if (!escuchando) return;
+  escuchando = false;
+  try { recognition.stop(); } catch (_) {}
+  interinoEl.textContent = "";
+  estadoEl.textContent = "DETENIDO";
+  estadoEl.classList.remove("activo");
+  btnHold.classList.remove("grabando");
+  btnToggle.classList.remove("grabando");
+  modoActual = null;
+}
+
+// MANTÉN — interruptor momentáneo: graba solo mientras se mantiene pulsado.
+// Usamos pointer events (cubren ratón y táctil) + captura para que el "soltar"
+// se detecte aunque el dedo se mueva fuera del botón.
+btnHold.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  try { btnHold.setPointerCapture(e.pointerId); } catch (_) {}
+  iniciar("hold");
+});
+btnHold.addEventListener("pointerup",     () => { if (modoActual === "hold") detener(); });
+btnHold.addEventListener("pointercancel", () => { if (modoActual === "hold") detener(); });
+btnHold.addEventListener("contextmenu",   (e) => e.preventDefault());
+
+// TOCAR — interruptor con enclavamiento: toca para grabar, toca otra vez para parar.
+btnToggle.addEventListener("click", () => {
+  if (escuchando && modoActual === "toggle") detener();
+  else if (!escuchando) iniciar("toggle");
 });
 
 // 6) Acciones: copiar, descargar, limpiar.

@@ -26,12 +26,22 @@
       ⚠ NAVEGADOR NO COMPATIBLE — ABRE EN GOOGLE CHROME
     </div>
 
-    <!-- Botón principal -->
-    <section class="bloque">
-      <button id="btn-dictar" class="rec">
-        <span class="rec__punto"></span>
-        <span class="rec__txt">EMPEZAR A DICTAR</span>
-      </button>
+    <!-- Controles de grabación -->
+    <section class="bloque grabacion">
+      <div class="botones-rec">
+        <div class="rec-cell">
+          <button id="btn-hold" class="rec-circ" aria-label="Mantener pulsado para grabar">
+            <span class="rec-circ__glifo"></span>
+          </button>
+          <span class="rec-label">MANTÉN<small>PULSADO</small></span>
+        </div>
+        <div class="rec-cell">
+          <button id="btn-toggle" class="rec-circ rec-circ--toggle" aria-label="Tocar para grabar y parar">
+            <span class="rec-circ__glifo"></span>
+          </button>
+          <span class="rec-label">TOCAR<small>ON · OFF</small></span>
+        </div>
+      </div>
       <div class="estado-linea">
         <span id="estado" class="estado">DETENIDO</span>
       </div>
@@ -87,6 +97,6 @@
     </footer>
   </div>
 
-  <script src="js/main.js?v=6"></script>
+  <script src="js/main.js?v=7"></script>
 </body>
 </html>
