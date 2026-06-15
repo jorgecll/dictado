@@ -59,7 +59,8 @@ function autocorregir(texto) {
 // 4) Configurar el reconocimiento de voz.
 let recognition = null;
 let escuchando = false;
-let textoFinal = "";   // lo ya reconocido en firme
+let baseRaw = "";      // texto consolidado (sesiones previas + ediciones a mano)
+let finalSesion = "";  // texto definitivo de la sesión de escucha actual
 
 function crearReconocimiento() {
   const r = new SpeechRecognition();
@@ -68,16 +69,17 @@ function crearReconocimiento() {
   r.interimResults = true;   // mostrar resultados provisionales
 
   r.onresult = (evento) => {
+    // Reconstruimos SIEMPRE desde cero el texto de esta sesión (índices 0..n).
+    // En Android, 'onresult' se dispara varias veces para la misma frase; si
+    // fuéramos acumulando, saldría repetida ("hola hola hola").
+    finalSesion = "";
     let interino = "";
-    for (let i = evento.resultIndex; i < evento.results.length; i++) {
-      const trozo = evento.results[i][0].transcript;
-      if (evento.results[i].isFinal) {
-        textoFinal += trozo + " ";
-      } else {
-        interino += trozo;
-      }
+    for (let i = 0; i < evento.results.length; i++) {
+      const res = evento.results[i];
+      if (res.isFinal) finalSesion += res[0].transcript + " ";
+      else interino += res[0].transcript + " ";
     }
-    textoEl.value = autocorregir(textoFinal);
+    textoEl.value = autocorregir(baseRaw + finalSesion);
     interinoEl.textContent = interino;
     textoEl.scrollTop = textoEl.scrollHeight;
     actualizarContador();
@@ -93,8 +95,11 @@ function crearReconocimiento() {
     }
   };
 
-  // Si sigue activo el modo dictado, reiniciar al cortarse (límite del navegador).
+  // Al terminar una sesión (Android la corta tras cada frase) consolidamos lo
+  // reconocido en la base y, si seguimos dictando, reiniciamos.
   r.onend = () => {
+    baseRaw += finalSesion;
+    finalSesion = "";
     if (escuchando) {
       try { r.start(); } catch (_) {}
     }
@@ -106,7 +111,8 @@ function crearReconocimiento() {
 // 5) Botón empezar/parar.
 btnDictar.addEventListener("click", () => {
   if (!escuchando) {
-    textoFinal = textoEl.value ? textoEl.value + " " : ""; // conservar lo editado a mano
+    baseRaw = textoEl.value ? textoEl.value + " " : ""; // conservar lo editado a mano
+    finalSesion = "";
     recognition = crearReconocimiento();
     escuchando = true;
     recognition.start();
@@ -142,7 +148,8 @@ document.getElementById("btn-descargar").addEventListener("click", () => {
 });
 
 document.getElementById("btn-limpiar").addEventListener("click", () => {
-  textoFinal = "";
+  baseRaw = "";
+  finalSesion = "";
   textoEl.value = "";
   interinoEl.textContent = "";
   actualizarContador();
