@@ -14,7 +14,7 @@ const interinoEl   = document.getElementById("interino");
 const contadorEl   = document.getElementById("contador");
 
 // --- Versión visible (se cambia en cada despliegue para identificarla en el móvil) ---
-const VERSION = "v7";
+const VERSION = "v8";
 document.getElementById("version").textContent = VERSION;
 const vPie = document.getElementById("version-pie");
 if (vPie) vPie.textContent = "DICTADO · " + VERSION;

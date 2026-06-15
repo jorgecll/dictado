@@ -29,17 +29,20 @@
     <!-- Controles de grabación -->
     <section class="bloque grabacion">
       <div class="botones-rec">
+        <!-- TOCAR (toggle): tecla rectangular tipo casete que se enclava -->
         <div class="rec-cell">
-          <button id="btn-hold" class="rec-circ" aria-label="Mantener pulsado para grabar">
-            <span class="rec-circ__glifo"></span>
-          </button>
-          <span class="rec-label">MANTÉN<small>PULSADO</small></span>
-        </div>
-        <div class="rec-cell">
-          <button id="btn-toggle" class="rec-circ rec-circ--toggle" aria-label="Tocar para grabar y parar">
-            <span class="rec-circ__glifo"></span>
+          <button id="btn-toggle" class="rec-key" aria-label="Tocar para grabar y parar">
+            <span class="rec-key__dot"></span>
+            <span class="rec-key__txt">REC</span>
           </button>
           <span class="rec-label">TOCAR<small>ON · OFF</small></span>
+        </div>
+        <!-- MANTÉN (push-to-talk): botón redondo grande, a la derecha -->
+        <div class="rec-cell">
+          <button id="btn-hold" class="rec-dial" aria-label="Mantener pulsado para grabar">
+            <span class="rec-dial__core"></span>
+          </button>
+          <span class="rec-label">MANTÉN<small>PULSADO</small></span>
         </div>
       </div>
       <div class="estado-linea">
@@ -97,6 +100,6 @@
     </footer>
   </div>
 
-  <script src="js/main.js?v=7"></script>
+  <script src="js/main.js?v=8"></script>
 </body>
 </html>

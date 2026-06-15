@@ -82,58 +82,93 @@ body {
   border-bottom: var(--borde);
 }
 
-/* --- Controles de grabación circulares (Braun / Teenage Engineering) --- */
-.grabacion { text-align: center; padding-top: 1.9rem; padding-bottom: 1.9rem; }
+/* --- Controles de grabación (Braun / Teenage Engineering / Walkman) --- */
+.grabacion { text-align: center; padding-top: 2rem; padding-bottom: 2rem; }
 .botones-rec {
   display: flex;
   justify-content: center;
-  gap: clamp(2rem, 13vw, 4.5rem);
+  align-items: flex-end;            /* alinea las etiquetas abajo aunque difieran de alto */
+  gap: clamp(1.75rem, 11vw, 4rem);
 }
-.rec-cell { display: flex; flex-direction: column; align-items: center; gap: 0.85rem; }
+.rec-cell { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
 
-.rec-circ {
-  position: relative;
-  width: 88px; height: 88px;
-  border: var(--borde);
-  border-radius: 50%;
-  background: var(--blanco);
-  box-shadow: 5px 5px 0 var(--negro);
-  display: flex; align-items: center; justify-content: center;
+/* Base común de pulsación táctil */
+.rec-key, .rec-dial {
   cursor: pointer;
-  transition: transform 0.07s ease, box-shadow 0.07s ease;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   touch-action: manipulation;
   user-select: none;
+  transition: transform 0.06s ease, box-shadow 0.06s ease, background 0.12s ease;
 }
-/* Anillo concéntrico = relieve de botón físico */
-.rec-circ::before {
+
+/* === IZQUIERDA · TOCAR: tecla rectangular tipo casete (toggle) === */
+.rec-key {
+  position: relative;
+  width: 132px; height: 78px;
+  background: var(--blanco);
+  border: var(--borde);
+  box-shadow: 6px 6px 0 var(--negro);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+  color: var(--negro);
+}
+/* Ranuras de agarre en la parte superior (estética tecla de casete) */
+.rec-key::before {
   content: "";
-  position: absolute;
-  inset: 8px;
-  border-radius: 50%;
-  border: 1px solid #d9d9d9;
+  position: absolute; left: 8px; right: 8px; top: 7px; height: 11px;
+  background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 6px);
+  opacity: 0.25;
   pointer-events: none;
 }
-/* Pulsado: se hunde (táctil) */
-.rec-circ:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--negro); }
-
-/* Glifo central = punto de grabación rojo */
-.rec-circ__glifo {
-  width: 30px; height: 30px;
+.rec-key__dot {
+  width: 14px; height: 14px; border-radius: 50%;
   background: var(--rojo);
-  border-radius: 50%;
-  transition: border-radius 0.14s ease, width 0.14s ease, height 0.14s ease;
+  border: 2px solid currentColor;
 }
+.rec-key__txt {
+  font-family: "Space Mono", monospace;
+  font-size: 0.95rem; font-weight: 700; letter-spacing: 0.22em;
+}
+.rec-key:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--negro); }
+/* Enclavada (grabando): hundida del todo, en negro, con el piloto rojo latiendo */
+.rec-key.grabando {
+  transform: translate(6px, 6px);
+  box-shadow: 0 0 0 var(--negro);
+  background: var(--negro);
+  color: var(--blanco);
+}
+.rec-key.grabando .rec-key__dot { animation: latido 0.9s infinite; }
 
-/* MANTÉN (momentáneo): mientras graba, el punto late */
-.rec-circ.grabando .rec-circ__glifo { animation: latido 0.9s infinite; }
+/* === DERECHA · MANTÉN: dial redondo de grabación (push-to-talk) === */
+.rec-dial {
+  position: relative;
+  width: 112px; height: 112px;
+  border: var(--borde);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 36%, #ffffff, #ededed 72%);
+  box-shadow: 6px 6px 0 var(--negro);
+  display: flex; align-items: center; justify-content: center;
+}
+/* Anillos concéntricos = botón físico de grabación */
+.rec-dial::before {
+  content: ""; position: absolute; inset: 10px;
+  border-radius: 50%; border: 1px solid #cfcfcf; pointer-events: none;
+}
+.rec-dial::after {
+  content: ""; position: absolute; inset: 18px;
+  border-radius: 50%; border: 1px solid #e2e2e2; pointer-events: none;
+}
+.rec-dial__core {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, #ff3b3b, var(--rojo) 70%);
+  box-shadow: 0 0 0 3px var(--blanco), 0 2px 4px rgba(0,0,0,0.25);
+}
+.rec-dial:active,
+.rec-dial.grabando { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--negro); }
+.rec-dial.grabando .rec-dial__core { animation: latido 0.8s infinite; }
 
-/* TOCAR (enclavado): mientras graba se queda hundido y el punto -> cuadrado (stop) */
-.rec-circ--toggle.grabando { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--negro); }
-.rec-circ--toggle.grabando .rec-circ__glifo { border-radius: 3px; width: 26px; height: 26px; }
-
-@keyframes latido { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+@keyframes latido { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
 
 .rec-label {
   font-family: "Space Mono", monospace;
@@ -152,7 +187,7 @@ body {
   margin-top: 0.15rem;
 }
 
-.estado-linea { margin-top: 1.5rem; }
+.estado-linea { margin-top: 1.6rem; }
 .estado {
   font-family: "Space Mono", monospace;
   font-size: 0.75rem;
